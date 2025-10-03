@@ -21,12 +21,12 @@ ds_64 = np.rot90(ds_64["VelX1"][:].reshape(64 + 2, 64 + 2)[1:-1, 1:-1], 3)
 ds_128 = h5py.File(f"data/convergence_128x128/test.output.{str(Time).zfill(4)}.h5", "r")
 ds_128 = np.rot90(ds_128["VelX1"][:].reshape(128 + 2, 128 + 2)[1:-1, 1:-1], 3)
 
-eps_128_64 = abs(ds_128[128 // 2, 128 // 2] - ds_64[64 // 2, 64 // 2])
-eps_64_32 = abs(ds_128[128 // 2, 128 // 2] - ds_32[32 // 2, 32 // 2])
-eps_32_16 = abs(ds_128[128 // 2, 128 // 2] - ds_16[16 // 2, 16 // 2])
+eps_128_64 = np.sqrt((ds_128[128 // 2, 128 // 2] - ds_64[64 // 2, 64 // 2]) ** 2)
+eps_128_32 = np.sqrt((ds_128[128 // 2, 128 // 2] - ds_32[32 // 2, 32 // 2]) ** 2)
+eps_128_16 = np.sqrt((ds_128[128 // 2, 128 // 2] - ds_16[16 // 2, 16 // 2]) ** 2)
 
 dxs = [1 / 128, 1 / 64, 1 / 32]
-eps = [eps_128_64, eps_64_32, eps_32_16]
+eps = [eps_128_64, eps_128_32, eps_128_16]
 
 plt.style.use("classic")
 fig = plt.figure(figsize=(8, 8))
@@ -46,7 +46,8 @@ plt.xscale("log")
 
 plt.xlabel(r"Grid Spacing $\Delta x$", fontsize=16)
 plt.ylabel(
-    r"Norm Error $||\epsilon||_{L^1} = \frac{1}{N} \sum_{1 \leq i,j \leq N} |u \, (x_i, y_j) - u^*(x_i, y_j)|$",
+    r"Norm Error $||\epsilon||_{L^2} = \sqrt{\frac{1}{N^2} \sum_{1 \leq i,j \leq N} [u \, (x_i, y_j) - u^*(x_i, y_j)]^2}$",
+#    r"Norm Error $||\epsilon||_{L^2} = \sqrt{\frac{1}{N^2} \sum_{1 \leq j \leq N} [u \, (x_j, t) - u^*(x_j, t)]^2}$",
     fontsize=16,
 )
 plt.title(r"Spatial Convergence $\mathrm{Ma} = 0.025$", fontsize=16)
@@ -59,7 +60,7 @@ plt.savefig("spatial_convergence.png", bbox_inches="tight", dpi=300)
 plt.show()
 plt.close()
 
-# print("slope = ",(eps[-1] - eps[0])/(dxs[-1] - dxs[0]))
+#print("slope = ",(eps[-1] - eps[0])/(dxs[-1] - dxs[0]))
 
 ###################################### Temporal Convergence ############################################
 
@@ -77,12 +78,12 @@ ds_001 = np.rot90(ds_001["VelX1"][:].reshape(32 + 2, 32 + 2)[1:-1, 1:-1], 3)
 ds_0005 = h5py.File(f"data/time_conv_0005/test.output.{str(Time).zfill(4)}.h5", "r")
 ds_0005 = np.rot90(ds_0005["VelX1"][:].reshape(32 + 2, 32 + 2)[1:-1, 1:-1], 3)
 
-eps_0005_001 = abs(ds_0005[32 // 2, 32 // 2] - ds_001[32 // 2, 32 // 2])
-eps_001_005 = abs(ds_0005[32 // 2, 32 // 2] - ds_005[32 // 2, 32 // 2])
-eps_005_01 = abs(ds_0005[32 // 2, 32 // 2] - ds_01[32 // 2, 32 // 2])
+eps_0005_001 = np.sqrt((ds_0005[32 // 2, 32 // 2] - ds_001[32 // 2, 32 // 2]) ** 2)
+eps_0005_005 = np.sqrt((ds_0005[32 // 2, 32 // 2] - ds_005[32 // 2, 32 // 2]) ** 2)
+eps_0005_01 = np.sqrt((ds_0005[32 // 2, 32 // 2] - ds_01[32 // 2, 32 // 2]) ** 2)
 
 dts = [4.39067e-8, 8.78134e-8, 4.39067e-7]
-eps = [eps_0005_001, eps_001_005, eps_005_01]
+eps = [eps_0005_001, eps_0005_005, eps_0005_01]
 
 plt.style.use("classic")
 fig = plt.figure(figsize=(8, 8))
@@ -110,7 +111,7 @@ plt.xscale("log")
 
 plt.xlabel(r"Timestep $\Delta t$", fontsize=16)
 plt.ylabel(
-    r"Norm Error $||\epsilon||_{L^1} = \frac{1}{n} \sum_{1 \leq t_n \leq n} |u \, (t_n) - u^*(t_n)|$",
+    r"Norm Error $||\epsilon||_{L^2} = \sqrt{\frac{1}{n^2} \sum_{1 \leq t_n \leq n} [u \, (t_n) - u^*(t_n)]^2}$",
     fontsize=16,
 )
 plt.title(r"Temporal Convergence $\mathrm{Ma} = 0.025$", fontsize=16)
@@ -123,4 +124,4 @@ plt.savefig("temporal_convergence.png", bbox_inches="tight", dpi=300)
 plt.show()
 plt.close()
 
-# print("slope = ",(eps[-1] - eps[0])/(dts[-1] - dts[0]))
+#print("slope = ",(eps[-1] - eps[0])/(dts[-1] - dts[0]))
