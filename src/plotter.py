@@ -97,7 +97,7 @@ for f in tqdm(
     fig.add_axes(cax)
     fig.colorbar(im, cax=cax)
 
-    plt.savefig(f"{field}_{strnum}_lid.png", bbox_inches="tight", dpi=300)
+    plt.savefig(f"{field}_{strnum}_lid.png", bbox_inches="tight", dpi=1200)
     plt.close()
 
 if args.multi:
@@ -182,5 +182,5 @@ if args.multi:
     fig.add_axes(cax)
     fig.colorbar(im_02, cax=cax)
 
-    plt.savefig("multiplot.png", dpi=300)
+    plt.savefig("multiplot.png", dpi=1200)
     plt.close()
